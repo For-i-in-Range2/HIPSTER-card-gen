@@ -46,6 +46,16 @@ Autre nom de sortie : `python3 generate_cards.py chansons.csv -o soiree.pdf`
 4. Découpe le long des traits gris. Papier épais (200 g+) recommandé,
    ou colle la feuille sur du carton avant découpe.
 
+## ⚠️ Ne pas scanner avec l'appli Hitster officielle
+
+Les cartes officielles contiennent un lien `www.hitstergame.com/fr/XXXXX` — un
+simple numéro de carte que seule l'appli officielle sait relier à une chanson
+(sa base de données est privée). Elle refuse tout autre QR code.
+
+Nos cartes maison contiennent directement le lien Spotify : il faut les scanner
+avec **l'appareil photo du téléphone** (ou n'importe quelle appli de scan QR).
+La chanson s'ouvre alors dans Spotify.
+
 ## Règles du jeu (rappel rapide)
 
 Chaque joueur construit une frise chronologique devant lui. À son tour, on

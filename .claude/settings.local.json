@@ -5,7 +5,8 @@
       "PowerShell(node --version)",
       "PowerShell(python3 \"C:\\\\Users\\\\kyrub\\\\Documents\\\\dev\\\\hipster card\\\\generate_cards.py\" \"C:\\\\Users\\\\kyrub\\\\Documents\\\\dev\\\\hipster card\\\\chansons.csv\" -o \"C:\\\\Users\\\\kyrub\\\\Documents\\\\dev\\\\hipster card\\\\cartes.pdf\")",
       "PowerShell(python3 -m pip install --user --quiet pymupdf)",
-      "PowerShell(python3 -c \"import fitz; doc = fitz.open\\(r'C:\\\\Users\\\\kyrub\\\\Documents\\\\dev\\\\hipster card\\\\cartes.pdf'\\); [p.get_pixmap\\(dpi=100\\).save\\(rf'C:\\\\Users\\\\kyrub\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-kyrub-Documents-dev-hipster-card\\\\926cb4c7-8265-4eb3-a9ed-7ad5039a5a44\\\\scratchpad\\\\page{i+1}.png'\\) for i, p in enumerate\\(doc\\)]; print\\('pages:', len\\(doc\\)\\)\")"
+      "PowerShell(python3 -c \"import fitz; doc = fitz.open\\(r'C:\\\\Users\\\\kyrub\\\\Documents\\\\dev\\\\hipster card\\\\cartes.pdf'\\); [p.get_pixmap\\(dpi=100\\).save\\(rf'C:\\\\Users\\\\kyrub\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-kyrub-Documents-dev-hipster-card\\\\926cb4c7-8265-4eb3-a9ed-7ad5039a5a44\\\\scratchpad\\\\page{i+1}.png'\\) for i, p in enumerate\\(doc\\)]; print\\('pages:', len\\(doc\\)\\)\")",
+      "PowerShell(python3 -m pip install --user --quiet opencv-python-headless)"
     ]
   }
 }
