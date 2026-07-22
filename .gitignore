@@ -1,0 +1,6 @@
+# Outillage local Claude Code (config machine, pas l'appli)
+.claude/
+
+# Python
+__pycache__/
+*.pyc
