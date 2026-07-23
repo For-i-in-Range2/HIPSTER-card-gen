@@ -1,7 +1,3 @@
-// -----------------------------------------------------------------------------
-//  Connexion Spotify (OAuth PKCE) + lecture via le Web Playback SDK.
-//  Nécessite un compte Premium sur l'appareil "lecteur".
-// -----------------------------------------------------------------------------
 import { CONFIG } from "./config.js";
 
 const SCOPES = [
@@ -14,7 +10,6 @@ const SCOPES = [
 
 const TOKEN_KEY = "hitster_token";
 
-// ------------------------------------------------------------------ PKCE utils
 function randomString(len) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
   const bytes = crypto.getRandomValues(new Uint8Array(len));
@@ -31,9 +26,8 @@ function base64url(buffer) {
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-// ------------------------------------------------------------------ token store
 function saveToken(data) {
-  data.expires_at = Date.now() + (data.expires_in - 60) * 1000; // marge de 60 s
+  data.expires_at = Date.now() + (data.expires_in - 60) * 1000;
   localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
 }
 
@@ -50,7 +44,6 @@ export function logout() {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-// ------------------------------------------------------------------ auth flow
 export async function login() {
   const verifier = randomString(64);
   const challenge = base64url(await sha256(verifier));
@@ -67,7 +60,6 @@ export async function login() {
   window.location.href = `https://accounts.spotify.com/authorize?${params}`;
 }
 
-// Appelé au chargement : si Spotify nous a renvoyés avec ?code=..., on échange.
 export async function handleRedirect() {
   const url = new URL(window.location.href);
   const code = url.searchParams.get("code");
@@ -91,7 +83,6 @@ export async function handleRedirect() {
   if (!res.ok) throw new Error("Échange du token échoué : " + (await res.text()));
   saveToken(await res.json());
 
-  // On nettoie l'URL (retire ?code=...) sans recharger la page.
   window.history.replaceState({}, document.title, CONFIG.REDIRECT_URI);
   return true;
 }
@@ -111,7 +102,7 @@ async function refreshToken() {
   });
   if (!res.ok) throw new Error("Rafraîchissement du token échoué.");
   const data = await res.json();
-  data.refresh_token = data.refresh_token || token.refresh_token; // parfois absent
+  data.refresh_token = data.refresh_token || token.refresh_token;
   saveToken(data);
   return data.access_token;
 }
@@ -123,19 +114,17 @@ async function getAccessToken() {
   return token.access_token;
 }
 
-// ------------------------------------------------------------------ appels API
 async function api(path, options = {}) {
   const accessToken = await getAccessToken();
   const res = await fetch(`https://api.spotify.com/v1${path}`, {
     ...options,
     headers: { ...options.headers, Authorization: `Bearer ${accessToken}` },
   });
-  if (res.status === 204) return null;         // pas de contenu (ex: play OK)
+  if (res.status === 204) return null;
   if (!res.ok) throw new Error(`Spotify API ${res.status} : ${await res.text()}`);
   return res.json();
 }
 
-// Récupère titre / artiste / année à partir d'un ID de piste (pour la révélation).
 export async function getTrack(trackId) {
   const t = await api(`/tracks/${trackId}`);
   const year = parseInt((t.album?.release_date || "0").slice(0, 4), 10);
@@ -149,7 +138,6 @@ export async function getTrack(trackId) {
   };
 }
 
-// ------------------------------------------------------------------ Playback SDK
 let player = null;
 let deviceId = null;
 
@@ -187,9 +175,9 @@ export async function playTrack(uri) {
 }
 
 export async function pause() {
-  try { await player?.pause(); } catch { /* ignore */ }
+  try { await player?.pause(); } catch {}
 }
 
 export async function resume() {
-  try { await player?.resume(); } catch { /* ignore */ }
+  try { await player?.resume(); } catch {}
 }

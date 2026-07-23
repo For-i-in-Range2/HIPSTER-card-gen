@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Générateur de cartes façon Hitster.
 
@@ -26,24 +25,22 @@ from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen import canvas
 
-# ---------------------------------------------------------------- mise en page
-PAGE_W, PAGE_H = A4          # 210 x 297 mm
-CARD = 65 * mm               # cartes carrées de 65 mm (comme le vrai jeu)
-COLS, ROWS = 3, 4            # 12 cartes par page
+PAGE_W, PAGE_H = A4
+CARD = 65 * mm
+COLS, ROWS = 3, 4
 GRID_W = COLS * CARD
 GRID_H = ROWS * CARD
 MARGIN_X = (PAGE_W - GRID_W) / 2
 MARGIN_Y = (PAGE_H - GRID_H) / 2
 QR_SIZE = 46 * mm
 
-# couleurs d'accent qui tournent de carte en carte (fond du disque de l'année)
 PALETTE = [
-    (0.91, 0.30, 0.24),   # rouge
-    (0.16, 0.50, 0.73),   # bleu
-    (0.15, 0.68, 0.38),   # vert
-    (0.95, 0.61, 0.07),   # orange
-    (0.61, 0.35, 0.71),   # violet
-    (0.10, 0.74, 0.61),   # turquoise
+    (0.91, 0.30, 0.24),
+    (0.16, 0.50, 0.73),
+    (0.15, 0.68, 0.38),
+    (0.95, 0.61, 0.07),
+    (0.61, 0.35, 0.71),
+    (0.10, 0.74, 0.61),
 ]
 
 
@@ -52,7 +49,6 @@ def strip_accents(s: str) -> str:
                    if unicodedata.category(c) != "Mn")
 
 
-# ------------------------------------------------------------------ lecture CSV
 HEADER_ALIASES = {
     "url": {"url", "lien", "link", "spotify", "lienspotify", "spotifyurl"},
     "artiste": {"artiste", "artist", "artistes"},
@@ -72,7 +68,7 @@ def normalize_header(h: str) -> str:
 def clean_spotify_url(raw: str) -> str:
     """Nettoie le lien Spotify (supprime ?si=..., accepte les URI spotify:track:...)."""
     raw = raw.strip()
-    if raw.startswith("spotify:"):           # spotify:track:ID -> URL web
+    if raw.startswith("spotify:"):
         parts = raw.split(":")
         if len(parts) == 3:
             return f"https://open.spotify.com/{parts[1]}/{parts[2]}"
@@ -80,7 +76,6 @@ def clean_spotify_url(raw: str) -> str:
     p = urlparse(raw)
     if "spotify" not in p.netloc:
         print(f"  [!] attention, ce lien ne ressemble pas a un lien Spotify : {raw}")
-    # on retire les paramètres de tracking (?si=...) : le QR reste plus simple à scanner
     return f"{p.scheme}://{p.netloc}{p.path}"
 
 
@@ -88,7 +83,6 @@ def read_songs(path: str) -> list[dict]:
     with open(path, encoding="utf-8-sig", newline="") as f:
         sample = f.read(4096)
         f.seek(0)
-        # Excel en français exporte avec des ';', sinon ','
         delimiter = ";" if sample.count(";") >= sample.count(",") else ","
         reader = csv.DictReader(f, delimiter=delimiter)
         reader.fieldnames = [normalize_header(h) for h in reader.fieldnames or []]
@@ -115,7 +109,6 @@ def read_songs(path: str) -> list[dict]:
     return songs
 
 
-# ------------------------------------------------------------------ dessin
 def card_origin(col: int, row: int) -> tuple[float, float]:
     """Coin bas-gauche de la carte (col, row), row 0 = rangée du haut."""
     x = MARGIN_X + col * CARD
@@ -176,7 +169,6 @@ def draw_wrapped_centred(c, text, font, max_size, cx, top_y, max_width, leading_
     """Dessine le texte centré, sur 2 lignes max, en réduisant la police si besoin."""
     lines = simpleSplit(text, font, max_size, max_width)
     if len(lines) > 2:
-        # trop long pour 2 lignes -> on réduit la police jusqu'à tenir
         size = max_size
         while size > 6:
             size -= 0.5
@@ -190,7 +182,7 @@ def draw_wrapped_centred(c, text, font, max_size, cx, top_y, max_width, leading_
     for line in lines:
         c.drawCentredString(cx, y, line)
         y -= max_size * leading_ratio
-    return y  # position sous la dernière ligne
+    return y
 
 
 def draw_info_card(c: canvas.Canvas, song: dict, col: int, row: int):
@@ -200,12 +192,10 @@ def draw_info_card(c: canvas.Canvas, song: dict, col: int, row: int):
     color = PALETTE[(song["num"] - 1) % len(PALETTE)]
     inner_w = CARD - 10 * mm
 
-    # artiste en haut
     c.setFillColorRGB(0.1, 0.1, 0.1)
     draw_wrapped_centred(c, song["artiste"], "Helvetica-Bold", 11,
                          cx, y + CARD - 10 * mm, inner_w)
 
-    # disque coloré + année au centre
     c.setFillColorRGB(*color)
     c.circle(cx, cy, 12.5 * mm, stroke=0, fill=1)
     c.setFillColorRGB(1, 1, 1)
@@ -213,7 +203,6 @@ def draw_info_card(c: canvas.Canvas, song: dict, col: int, row: int):
     c.setFont("Helvetica-Bold", fitted_font_size(year, "Helvetica-Bold", 20, 22 * mm))
     c.drawCentredString(cx, cy - 3 * mm, year)
 
-    # titre en bas
     c.setFillColorRGB(0.1, 0.1, 0.1)
     lines = simpleSplit(song["titre"], "Helvetica-Oblique", 10, inner_w)
     size = 10
@@ -226,13 +215,11 @@ def draw_info_card(c: canvas.Canvas, song: dict, col: int, row: int):
         c.drawCentredString(cx, base, line)
         base -= size * 1.15
 
-    # numéro de carte (doit correspondre au recto après impression)
     c.setFont("Helvetica", 6)
     c.setFillColorRGB(0.6, 0.6, 0.6)
     c.drawCentredString(cx, y + 1.8 * mm, f"n° {song['num']}")
 
 
-# ------------------------------------------------------------------ assemblage
 def generate_pdf(songs: list[dict], out_path: str):
     c = canvas.Canvas(out_path, pagesize=A4)
     per_page = COLS * ROWS
@@ -240,15 +227,11 @@ def generate_pdf(songs: list[dict], out_path: str):
     for start in range(0, len(songs), per_page):
         batch = songs[start:start + per_page]
 
-        # page recto : QR codes
         draw_cut_grid(c)
         for i, song in enumerate(batch):
             draw_qr_card(c, song, i % COLS, i // COLS)
         c.showPage()
 
-        # page verso : infos, colonnes inversées (miroir horizontal)
-        # pour que chaque verso tombe derrière son recto en impression
-        # recto-verso "retourner sur les bords longs"
         draw_cut_grid(c)
         for i, song in enumerate(batch):
             draw_info_card(c, song, COLS - 1 - (i % COLS), i // COLS)

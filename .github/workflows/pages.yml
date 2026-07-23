@@ -1,6 +1,3 @@
-# Publie le jeu (dossier game/) sur GitHub Pages à chaque push sur main.
-# À faire UNE fois côté GitHub : Settings → Pages → "Build and deployment" →
-# Source = "GitHub Actions".
 name: Deploy game to GitHub Pages
 
 on:
@@ -13,7 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-# Une seule publication à la fois.
 concurrency:
   group: pages
   cancel-in-progress: true

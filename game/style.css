@@ -4,7 +4,7 @@
   --card2: #23232e;
   --text: #f2f2f5;
   --muted: #9a9aa8;
-  --accent: #1db954;      /* vert Spotify */
+  --accent: #1db954;
   --accent-d: #159c45;
   --ok: #1db954;
   --ko: #e0413a;
@@ -35,7 +35,6 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
   padding: 4px 12px; border-radius: 999px; font-size: .8rem;
 }
 
-/* ------------------------------------------------------------- boutons */
 .btn {
   border: none; border-radius: 12px; padding: 14px 18px;
   font-size: 1rem; font-weight: 600; cursor: pointer;
@@ -63,7 +62,6 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 }
 .btn-x { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; }
 
-/* ------------------------------------------------------------- tour de jeu */
 .turn-head { text-align: center; font-size: 1.25rem; }
 .turn-head strong { color: var(--accent); }
 
@@ -85,7 +83,6 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .manual { margin: 4px 0; }
 .manual summary { color: var(--muted); font-size: .85rem; cursor: pointer; }
 
-/* ------------------------------------------------------------- frise */
 .timeline {
   display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch;
   justify-content: center; padding: 8px 0;
@@ -106,7 +103,6 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 }
 .slot.chosen { border-color: var(--accent); color: var(--accent); background: #14351f; }
 
-/* ------------------------------------------------------------- révélation */
 .reveal {
   text-align: center; border-radius: var(--radius); padding: 22px;
   background: var(--card); border: 2px solid transparent;

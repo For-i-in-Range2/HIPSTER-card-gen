@@ -1,15 +1,7 @@
-// -----------------------------------------------------------------------------
-//  Scan de QR code via la caméra du téléphone.
-//  Utilise l'API native BarcodeDetector (Chrome/Android, Safari iOS 17+).
-//  Repli : saisie/collage manuel d'un lien si l'API n'est pas dispo.
-// -----------------------------------------------------------------------------
-
 export function barcodeSupported() {
   return "BarcodeDetector" in window;
 }
 
-// Extrait l'ID de piste depuis un lien ou URI Spotify.
-// Accepte :  https://open.spotify.com/track/ID , open.spotify.com/intl-fr/track/ID , spotify:track:ID
 export function extractTrackId(text) {
   if (!text) return null;
   text = text.trim();
@@ -20,8 +12,6 @@ export function extractTrackId(text) {
   return null;
 }
 
-// Démarre la caméra et appelle onResult(rawText) au premier QR détecté.
-// Renvoie une fonction stop() pour couper la caméra.
 export async function startCamera(videoEl, onResult, onError) {
   if (!barcodeSupported()) {
     onError?.(new Error("nosupport"));
@@ -57,9 +47,9 @@ export async function startCamera(videoEl, onResult, onError) {
       const codes = await detector.detect(videoEl);
       if (codes.length > 0) {
         onResult(codes[0].rawValue);
-        return; // on laisse l'appelant décider d'appeler stop()
+        return;
       }
-    } catch { /* frame illisible, on continue */ }
+    } catch {}
     if (running) requestAnimationFrame(scan);
   };
   requestAnimationFrame(scan);

@@ -1,7 +1,3 @@
-// Petit jeu de cartes de démonstration (mode DEMO_MODE).
-// En mode réel, ces infos viennent de l'API Spotify après scan du QR.
-// L'ordre est volontairement mélangé : le joueur ne connaît pas l'année.
-
 export const DEMO_CARDS = [
   { trackId: "demo1", uri: null, artist: "Queen",       title: "Bohemian Rhapsody",          year: 1975 },
   { trackId: "demo2", uri: null, artist: "Daft Punk",   title: "Get Lucky",                  year: 2013 },

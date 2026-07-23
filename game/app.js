@@ -1,6 +1,3 @@
-// -----------------------------------------------------------------------------
-//  Hitster Maison — logique de jeu et interface
-// -----------------------------------------------------------------------------
 import { CONFIG } from "./config.js";
 import { DEMO_CARDS } from "./demo-cards.js";
 import * as spotify from "./spotify.js";
@@ -9,18 +6,17 @@ import { startCamera, extractTrackId, barcodeSupported } from "./scanner.js";
 const app = document.getElementById("app");
 
 const state = {
-  players: [],       // [{ name, timeline: [card] }]
-  current: 0,        // index du joueur dont c'est le tour
-  phase: "home",     // home | draw | placing | revealed | win
-  card: null,        // carte en cours (année cachée tant que non révélée)
-  chosenSlot: null,  // position d'insertion choisie
-  correct: null,     // résultat de la validation
-  deck: [],          // pioche (mode démo)
+  players: [],
+  current: 0,
+  phase: "home",
+  card: null,
+  chosenSlot: null,
+  correct: null,
+  deck: [],
   spotifyReady: false,
   stopCamera: null,
 };
 
-// ----------------------------------------------------------------- utilitaires
 const el = (html) => {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
@@ -38,7 +34,6 @@ function shuffle(arr) {
 
 const sortedTimeline = (p) => [...p.timeline].sort((a, b) => a.year - b.year);
 
-// Est-ce que placer `card` dans le trou `slot` de la frise `timeline` est correct ?
 function isPlacementCorrect(timeline, card, slot) {
   const tl = [...timeline].sort((a, b) => a.year - b.year);
   const left = slot > 0 ? tl[slot - 1].year : -Infinity;
@@ -46,7 +41,6 @@ function isPlacementCorrect(timeline, card, slot) {
   return card.year >= left && card.year <= right;
 }
 
-// ================================================================= ÉCRAN ACCUEIL
 function renderHome() {
   state.phase = "home";
   const needsSpotify = !CONFIG.DEMO_MODE;
@@ -113,14 +107,12 @@ function escapeHtml(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-// ================================================================= DÉBUT PARTIE
 async function startGame() {
   if (state.players.length < 1) { alert("Ajoute au moins un joueur."); return; }
 
   if (CONFIG.DEMO_MODE) {
     state.deck = shuffle(DEMO_CARDS);
   } else if (!state.spotifyReady) {
-    // Charge le SDK et connecte le lecteur une seule fois.
     try {
       app.replaceChildren(el(`<div class="screen"><p>Connexion au lecteur Spotify…</p></div>`));
       await spotify.initPlayer();
@@ -132,7 +124,6 @@ async function startGame() {
     }
   }
 
-  // Chaque joueur démarre avec une carte-repère déjà placée (comme le vrai jeu).
   for (const p of state.players) {
     const c = await nextCardForStart();
     if (c) p.timeline = [c];
@@ -142,13 +133,11 @@ async function startGame() {
   renderDraw();
 }
 
-// Carte de départ : en démo on pioche ; en réel on demande au joueur d'en scanner une.
 async function nextCardForStart() {
   if (CONFIG.DEMO_MODE) return state.deck.pop() || null;
-  return null; // en mode réel, la carte de départ se scanne au 1er tour (géré plus bas)
+  return null;
 }
 
-// ================================================================= ÉCRAN : PIOCHE
 function renderDraw() {
   state.phase = "draw";
   state.card = null;
@@ -234,7 +223,7 @@ async function onCardScanned(trackId) {
     const card = await spotify.getTrack(trackId);
     if (!card.year) throw new Error("Année de sortie introuvable pour cette piste.");
     state.card = card;
-    await spotify.playTrack(card.uri);      // la musique se lance, titre masqué
+    await spotify.playTrack(card.uri);
     renderPlacing();
   } catch (e) {
     alert("Impossible de charger la carte : " + e.message);
@@ -242,7 +231,6 @@ async function onCardScanned(trackId) {
   }
 }
 
-// ================================================================= ÉCRAN : PLACEMENT
 function renderPlacing() {
   state.phase = "placing";
   const p = state.players[state.current];
@@ -264,7 +252,6 @@ function renderPlacing() {
   app.querySelector("#validate").onclick = validatePlacement;
 }
 
-// Frise du joueur. Si `withSlots`, ajoute des zones cliquables entre les cartes.
 function renderTimelineHTML(player, withSlots) {
   const tl = sortedTimeline(player);
   let html = `<div class="timeline ${withSlots ? "interactive" : ""}">`;
@@ -297,7 +284,6 @@ function bindSlots() {
   });
 }
 
-// ================================================================= RÉVÉLATION
 async function validatePlacement() {
   const p = state.players[state.current];
   state.correct = isPlacementCorrect(p.timeline, state.card, state.chosenSlot);
@@ -337,7 +323,6 @@ function renderReveal() {
   };
 }
 
-// ================================================================= VICTOIRE
 function renderWin(winner) {
   state.phase = "win";
   app.replaceChildren(el(`
@@ -354,12 +339,11 @@ function renderWin(winner) {
   };
 }
 
-// ================================================================= DÉMARRAGE
 async function boot() {
   if (!CONFIG.DEMO_MODE) {
     try {
-      const returned = await spotify.handleRedirect(); // gère le retour d'OAuth
-      if (returned) { /* token stocké */ }
+      const returned = await spotify.handleRedirect();
+      if (returned) {}
     } catch (e) {
       alert(e.message);
     }

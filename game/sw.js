@@ -1,11 +1,3 @@
-// -----------------------------------------------------------------------------
-//  Service worker — permet d'installer le jeu (icône écran d'accueil) et de
-//  charger l'interface instantanément. On met en cache UNIQUEMENT les fichiers
-//  du jeu (même origine). Spotify (streaming + SDK) passe toujours par le réseau.
-//
-//  Si tu modifies un fichier du jeu, change le numéro de version ci-dessous
-//  (v1 -> v2 ...) pour forcer la mise à jour sur les téléphones déjà installés.
-// -----------------------------------------------------------------------------
 const CACHE = "hitster-v1";
 
 const ASSETS = [
@@ -43,18 +35,13 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // On ne gère que les GET de notre propre origine.
-  // Tout le reste (Spotify, CDN du SDK) part directement au réseau.
   if (req.method !== "GET" || url.origin !== self.location.origin) return;
 
-  // Navigation (ouverture de l'app, retour OAuth avec ?code=...) :
-  // réseau d'abord, repli sur la page d'accueil en cache si hors-ligne.
   if (req.mode === "navigate") {
     event.respondWith(fetch(req).catch(() => caches.match("./index.html")));
     return;
   }
 
-  // Ressources : cache d'abord, sinon réseau (et on met en cache au passage).
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
